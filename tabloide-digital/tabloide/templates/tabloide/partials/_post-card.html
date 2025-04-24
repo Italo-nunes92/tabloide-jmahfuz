@@ -1,0 +1,78 @@
+
+<article class="card">
+
+    
+    
+    {% if product.cover %}
+    <div class="card-cover-wrapper">
+       
+        <a href="{{product.get_absolute_url}}" class="card-cover-link">
+            
+            <img class="card-cover" loading="lazy"
+            src="{{product.cover}}"
+            alt="Foto {{product.title}}">
+        </a>
+    </div>
+    {% endif %} 
+   
+
+    <div class="card-text-wrapper">
+        <div class="card-title-wrapper" onclick="window.location.href='{{product.get_absolute_url}}';">
+            <h2 class="card-title">
+                <a href="{{product.get_absolute_url}}" class="card-title-link">
+                    {{product.name}}
+                </a>
+            </h2>
+            
+            <p class="card-subtitle">
+                {{product.excerpt}} 
+            </p>
+        </div>    
+
+                          
+        <div class="card-price-content">
+            <div class="card-price-wrapper">
+
+                À vista <b>R$ {{product.get_new_price}}</b>
+
+            </div>
+            
+
+
+
+            
+            
+            <div class="card-installment-wrapper">
+                <div class="juros">
+                    <div class="parcelamento">
+                        <span >ou no cartão em 12x:<br></span>
+
+                    </div>
+                    <div class="barra"></div>
+                    <div>
+                        <b class="inst"><sub>R$ </sub>{{product.installment_price.0}}<sup>,{{product.installment_price.1}}</sup></b><br>
+
+                    </div>
+                    
+                </div>
+                <div >
+                    <span class ="text-installment-bottom">Total <b>R$ {{product.fees}}</b> com juros.</span>
+                    
+                </div>
+            </div>
+            
+        </div>
+        <div class="offer-validity">Validade da oferta: {{promo.end_date}}</div>
+        
+        
+        <div class="card-actions">
+            <!-- SERA O LINK DO WHATSAPP-->
+            <a class="card-action-link" href="{%url 'tabloide:click-whatsapp' product.slug  %}" target="_blank">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span><b>Compre Agora!</b></span>
+                
+            </a>
+        </div>  
+        
+    </div>
+</article>

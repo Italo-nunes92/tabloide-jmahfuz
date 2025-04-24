@@ -1,0 +1,108 @@
+{% extends 'tabloide/base.html' %} 
+
+
+
+
+
+{% block content %}
+<main class="main-content single-product section-wrapper">
+  <div class="single-product-content section-content-narrow">
+    <div class="single-product-gap section-gap">
+      <div class="separator"></div>
+
+      <h1 style= "margin: 2% 0;"class="single-product-title center">
+        {{product_values.title}}
+      </h1>
+      <div class="separator"></div>
+      
+      <div class="swiper-container">
+        <div style="--swiper-navigation-color: #000; --swiper-pagination-color: #000" class="swiper mySwiper2">
+          <div class="swiper-wrapper">
+            {% for i in product_values.imgs  %}
+            <div class="swiper-slide">
+              <img loading="lazy" src="{{i}}" alt="{{product.category.name}}" />
+            </div>
+            {% endfor %}
+          </div>
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+        </div>
+        <div class="separator"></div>
+        <div thumbsSlider="" class="swiper mySwiper">
+          <div class="swiper-wrapper" >
+            {% for i in product_values.imgs  %}
+            <div class="swiper-slide">
+              <img src={{i}} />
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        </div>
+        <div class="separator"></div>
+      <div class="post-meta pb-base">
+        <div class="post-meta-item ">
+          <i class="fa-solid fa-calendar-days"></i>
+          <span>
+            Oferta válida até {{promo.end_date}}
+          </span>
+        </div>
+        {% if product.category %}
+        <div class="post-meta-item">
+          <a class="post-meta-link" href="{% url 'tabloide:category' pk=promo.pk slug=product.category.slug %}">
+            <i class="fa-solid fa-tag"></i>
+            <span>
+              {{ product.category.name }}
+            </span>
+          </a>
+        </div>
+        {% endif %}
+      </div>
+      
+      <div class="jm_novo">
+        {{product_values.description|safe}}        
+        
+      </div>
+      <div class="product-tags">
+        <span>Tags: </span>
+        {% for tag in product.tags.all %}
+        <a class="product-tag-link" href="{% url 'tabloide:tag' pk=promo.pk slug=tag.slug %}">
+          <i class="fa-solid fa-circle-right"></i>
+          <span>{{ tag.name }}</span>
+        </a>
+        
+        {% endfor %}
+        
+      </div>
+      <div class="nav-selling"> 
+        <div class="card-action-back"><a href={{back_url}}><p>Voltar</p></a></div>
+        
+        
+        <div class="card-action-nav"><a  href="{%url 'tabloide:click-whatsapp' product.slug %}" target="_blank">
+          <i class="fa-brands fa-whatsapp"></i>
+          <span><b>Compre Agora!</b></span>
+          
+        </a></div>
+        
+      </div>
+    </div>
+    <script>
+      var swiper = new Swiper(".mySwiper", {
+        spaceBetween: 10,
+        slidesPerView: {{product_values.imgs|length}} ,
+        freeMode: true,
+        watchSlidesProgress: true,
+      });
+      var swiper2 = new Swiper(".mySwiper2", {
+        spaceBetween: 10,
+        navigation: {
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev",
+        },
+        thumbs: {
+          swiper: swiper,
+        },
+      });
+    </script>
+  </main>
+  
+  {% endblock content %}

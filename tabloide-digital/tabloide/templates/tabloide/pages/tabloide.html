@@ -1,0 +1,25 @@
+{% extends 'tabloide/base.html' %}
+
+{% block content %}
+  <main class="main-content section-wrapper">
+    <div class="section-content-wide">
+      <div class="section-gap">
+        {% if object_list %}
+          <div class="card-grid">
+            {% for product in object_list %}
+              
+                {% include 'tabloide/partials/_post-card.html' with i=forloop.counter0 %}
+            {% endfor %}
+           </div>
+        {% else %}  
+          <h1 class="center">Produto não Encontrado</h1>
+          <p class="center">Sua busca não obteve resultados, verifique se tem algum erro ou volte a <a style="color: #00f;" href={% url "tabloide:index" %}>página principal</a></p>
+          
+          
+        {% endif %}
+        
+
+      </div>
+    </div>
+  </main>
+{% endblock content %}

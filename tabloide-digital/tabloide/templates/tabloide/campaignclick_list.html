@@ -1,0 +1,149 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    {% include 'tabloide/partials/_head.html' %}
+    <link rel="stylesheet" href="{% static 'tabloide/css/clickstyle.css' %}" />
+  </head>
+
+  <body>
+    <div class="page">
+      <nav>
+        <div class="user">
+          <i class="fa-solid fa-user-tie"></i> {{ user }}
+        </div>
+        <div class="buttons">
+          <div class="logo">
+            <a href="{% url 'tabloide:change_password' %}"><i class="fa-solid fa-key"></i> Trocar Senhas</a>
+          </div>
+          <div class="divisor"></div>
+          <div class="logo">
+            <a href="{% url 'tabloide:logout' %}"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
+          </div>
+        </div>
+      </nav>
+      <main class="main-content">
+        <div class="conteiner">
+          <div class="painel">
+            <div class="painel-wrapper">
+              <div class="painel-header">
+                <h1>Busca</h1>
+              </div>
+              <div class="divisor-h"></div>
+              <div class="painel-content">
+                <div class="painel-item">
+                  <form method="get" id="CampaignClickFilterForm">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="divisor-h"></div>
+                    <div class="button-grid">
+                      <button type="submit" class="filtrar">Filtrar</button>
+                      <button type="submit" name="export" value="excel">Exportar Excel</button>
+                      <button type="reset"><a href="{% url 'tabloide:campaign_clicks' %}" class="btn btn-secondary">Limpar</a></button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-conteiner">
+            <div class="table-content">
+              {% if form.options.value == '2' %}
+                {% for city, itens in object_list.items %}
+                  <br />
+                  <table border="1" id="customers">
+                    <thead>
+                      <tr>
+                        <th id="titulo"colspan="6">
+                          {{itens.0.number}} - {{ city }} <br />
+                        </th>
+                      </tr>
+                      <tr>
+                        <th>Código</th>
+                        <th>Produto</th>
+                        <th>Promoção</th>
+                        <th>Preço no Clique</th>
+                        <th>Quantidade Cliques</th>
+                        <th>Data</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for product in itens %}
+                        <tr>
+                          <td>{{ product.cod }}</td>
+                          <td>{{ product.product }}</td>
+                          <td>{{ product.promotion }}</td>
+                          <td>R$ {{ product.price }}</td>
+                          <td>{{ product.count }}</td>
+                          <td>{{ product.date }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                {% endfor %}
+              {% endif %}
+
+              {% if form.options.value == '1' %}
+                {% for city, itens in object_list.items %}
+                  <br />
+                  <table border="1" id="customers">
+                    <thead>
+                      <tr >
+                        <th id="titulo" colspan="5" >
+                         {{itens.0.number}} - {{ city }} <br />
+                        </th>
+                      </tr>
+                      <tr>
+                        <th>Código</th>
+                        <th>Produto</th>
+                        <th>Promoção</th>
+                        <th>Quantidade Cliques</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for product in itens %}
+                        <tr>
+                          <td>{{ product.cod }}</td>
+                          <td>{{ product.product }}</td>
+                          <td>{{ product.promotion }}</td>
+                          <td>{{ product.count }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </main>
+      <footer class="footer section-wrapper">
+        <div class="section-gap">
+          <div class="center">
+            <svg xmlns="http://www.w3.org/2000/svg" id="Layer_2" viewBox="0 0 242.88 169.52">
+              <defs>
+                <style>
+                  .cls-1,
+                  .cls-2 {
+                    fill: #fff;
+                  }
+                  .cls-2 {
+                    fill-rule: evenodd;
+                  }
+                </style>
+              </defs>
+              <g id="Camada_1">
+                <g>
+                  <rect class="cls-1" x="114.45" y="128.56" width="34.72" height="39.91" />
+                  <path class="cls-2" d="M0,146.96l23.78-22.38c4.68,6.59,9.19,10.58,15.79,10.58s11.28-5.55,11.28-14.05V.99h38.18V120.41c0,15.96-3.64,26.89-12.67,35.92-8.33,8.33-17.71,13.19-32.28,13.19-23.25,0-35.23-9.37-44.08-22.56Z" />
+                  <polygon class="cls-2" points="177.98 104.44 150.04 61.25 150.04 121.46 114.45 121.46 114.45 0 151.26 0 178.67 45.45 206.08 0 242.88 0 242.88 121.46 206.61 121.46 206.61 61.25 178.33 104.92 177.98 104.44" />
+                </g>
+              </g>
+            </svg>
+            <a>© {{ site_setup.title }} - Todos os direitos reservados.{% now 'Y' %}</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,188 @@
+{% extends 'tabloide/base.html' %}
+
+{% block content %}
+  <main class="main-content section-wrapper">
+    <div class="section-content-wide">
+      <div class="section-gap">
+        <div class="city-content">
+          <form class="city-input" method="post" id="cityForm">
+            {% csrf_token %}
+            {{ form.city }}
+            <button class="city-btn" type="submit">Ver Promoções</button>
+          </form>
+        </div>
+
+        <div class="pb-base"></div>
+
+        <div id="promotionsContainer" class="promotionsContainer">
+          {% if city_slug.city %}
+            {% include 'tabloide/partials/_promo-card.html' %}
+          {% endif %}
+        </div>
+
+        <script>
+        var swiper;
+        document.documentElement.style.setProperty("color-scheme", "light");
+
+        // Adiciona uma classe ao body para aplicar estilos específicos
+        document.body.classList.add("light-theme");
+
+        var citySlug = "{{ city_slug.city|escapejs }}";
+
+        if (citySlug) {
+          var container = document.getElementById("promotionsContainer");
+          window.history.replaceState(null, null, window.location.pathname.replace("/loja", ""));
+          smoothScrollTo(container, 800)
+        }
+      
+        function initSwiper() {
+          // Se já existir uma instância, destrua-a para evitar conflitos
+          if (swiper) {
+            swiper.destroy(true, true);
+          }
+          swiper = new Swiper(".mySwiper", {
+            slidesPerView: 1.1,
+            centeredSlides: true,
+            spaceBetween: 10,
+            loop: false,
+            autoplay: {
+              delay: 5000,
+              disableOnInteraction: false,
+            },
+            pagination: {
+              el: ".swiper-pagination",
+              clickable: true,
+              renderBullet: function (index, className) {
+                return '<span class="' + className + '">' + (index + 1) + "</span>";
+              },
+            },
+            navigation: {
+              nextEl: ".swiper-button-next",
+              prevEl: ".swiper-button-prev",
+            },
+            breakpoints: {
+              // Quando a largura da viewport for >= 768px (desktop)
+              768: {
+                  slidesPerView: 1.5, // Valor para desktop
+                  spaceBetween: 10, // Espaçamento maior para desktop
+              },
+            },
+          });
+        }
+      
+        // Função de easing para uma animação suave
+        function ease(t, b, c, d) {
+          t /= d / 2;
+          if (t < 1) return c / 2 * t * t + b;
+          t--;
+          return -c / 2 * (t * (t - 2) - 1) + b;
+        }
+      
+        // Função para rolagem suave customizada com duração ajustável
+        function smoothScrollTo(element, duration) {
+          var targetPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          var startPosition = window.pageYOffset;
+          var distance = targetPosition - startPosition;
+          var startTime = null;
+      
+          function animation(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            var timeElapsed = currentTime - startTime;
+            var run = ease(timeElapsed, startPosition, distance, duration);
+            window.scrollTo(0, run);
+            if (timeElapsed < duration) requestAnimationFrame(animation);
+          }
+          requestAnimationFrame(animation);
+        }
+      
+        // Atualiza o container de promoções, reinicializa o Swiper e realiza o scroll suave para o container
+        function updatePromotions(html) {
+          var container = document.getElementById("promotionsContainer");
+          container.innerHTML = html;
+          initSwiper();
+          smoothScrollTo(container, 800); // 800 ms de duração para o efeito de rolagem suave
+        }
+      
+        // Obtém a próxima cidade com base na posição e atualiza o campo do formulário
+        function getPromotions(lat, lon) {
+          
+          fetch("/nearest-city/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: `latitude=${lat}&longitude=${lon}`,
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.cidade_id) {
+              document.getElementById("cityForm").elements["city"].value = data.cidade_id;
+            }
+          })
+          .catch((error) => console.error("Erro:", error));
+        }
+      
+        document.addEventListener("DOMContentLoaded", function () {
+          initSwiper();
+      
+          var cityForm = document.getElementById("cityForm");
+          var promotionsContainer = document.getElementById("promotionsContainer");
+          var cityField = cityForm.elements["city"];
+      
+          cityForm.addEventListener("change", function () {
+            promotionsContainer.innerHTML = "";
+            window.history.replaceState(null, '', '/');
+          });
+      
+          cityForm.addEventListener("submit", function (e) {
+          
+            e.preventDefault();
+            fetch("{% url 'tabloide:promotions' %}", {
+              method: "GET",
+              headers: { "X-Requested-With": "XMLHttpRequest" },
+            })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error("Erro na requisição");
+              }
+              return response.text();
+            })
+            .then(html => {
+              updatePromotions(html);
+              var newSelect = cityField.value;
+              return fetch("/set-cidade-session/", {
+                method: "POST",
+                headers: {
+                  "X-CSRFToken": "{{ csrf_token }}",
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: `cidade_id=${newSelect}`,
+              });
+            })
+            .catch(error => console.error("Erro:", error));
+          });
+         
+          {% if not city_slug.city %}
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(
+                function (position) {
+                  getPromotions(position.coords.latitude, position.coords.longitude);
+                  
+                },
+                function (error) {
+                  console.error("Erro de geolocalização:", error);
+                }
+              );
+            } else {
+              alert("Seu navegador não suporta geolocalização");
+              
+            }
+          {% endif %}
+        });
+        
+      </script>
+      </div>
+    </div>
+  </main>
+{% endblock %}
