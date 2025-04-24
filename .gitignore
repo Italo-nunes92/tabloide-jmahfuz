@@ -160,3 +160,5 @@ gunicorn.txt
 nginx-http.txt
 nginx-https.txt
 Subindo no servidor.txt
+.local_docs/
+local_docs/
