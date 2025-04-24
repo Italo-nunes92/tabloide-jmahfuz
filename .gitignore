@@ -156,3 +156,7 @@ GitHub.sublime-settings
 !.vscode/launch.json
 !.vscode/extensions.json
 .history
+gunicorn.txt
+nginx-http.txt
+nginx-https.txt
+Subindo no servidor.txt
